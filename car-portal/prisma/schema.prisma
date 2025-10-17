@@ -1,0 +1,121 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// Enum for User Roles
+enum UserRole {
+  SUPERADMIN
+  CLIENT_ADMIN
+}
+
+// User model for authentication and authorization
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String? // Optional because a user might sign in via OAuth
+  role          UserRole  @default(CLIENT_ADMIN)
+
+  accounts Account[]
+  sessions Session[]
+
+  // Relation to a client (dealership)
+  client    Client?   @relation(fields: [clientId], references: [id])
+  clientId  String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+// NextAuth specific models
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Client model for multi-tenant dealerships
+model Client {
+  id        String    @id @default(cuid())
+  name      String    @unique // Name of the dealership
+
+  users     User[]
+  cars      Car[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+// Car model for the vehicles being sold
+model Car {
+  id            String    @id @default(cuid())
+  make          String
+  model         String
+  year          Int
+  price         Float
+  description   String
+  images        String // Stored as a JSON string: '["url1", "url2"]'
+
+  client        Client    @relation(fields: [clientId], references: [id])
+  clientId      String
+
+  carModelInfo  CarModelInfo? @relation(fields: [carModelInfoId], references: [id])
+  carModelInfoId String?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+// AI-generated information about specific car models
+model CarModelInfo {
+  id        String    @id @default(cuid())
+  modelKey  String    @unique
+
+  funFacts          String // Stored as a JSON string
+  positiveComments  String // Stored as a JSON string
+  statistics        String // Stored as a JSON string
+
+  cars      Car[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}

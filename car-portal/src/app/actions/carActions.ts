@@ -18,7 +18,7 @@ export async function createCar(prevState: { message: string }, formData: FormDa
   const year = Number(formData.get('year'));
   const price = Number(formData.get('price'));
   const description = formData.get('description') as string;
-  const images = (formData.get('images') as string).split(',').map(url => url.trim()).filter(url => url);
+  const images = formData.get('images') as string; // This is now a JSON string of URLs
 
   if (!make || !model || !year || !price || !description) {
     return { message: 'Todos los campos marcados con * son obligatorios.' };
@@ -148,7 +148,7 @@ export async function updateCar(prevState: { message: string }, formData: FormDa
   const year = Number(formData.get('year'));
   const price = Number(formData.get('price'));
   const description = formData.get('description') as string;
-  const images = (formData.get('images') as string).split(',').map(url => url.trim()).filter(url => url);
+  const images = formData.get('images') as string; // This is now a JSON string of URLs
 
   if (!make || !model || !year || !price || !description) {
     return { message: 'Todos los campos marcados con * son obligatorios.' };
