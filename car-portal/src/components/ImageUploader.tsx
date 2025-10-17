@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { deleteImage } from '@/app/actions/imageActions';
 
 interface ImageUploaderProps {
   name: string;
@@ -11,6 +12,7 @@ interface ImageUploaderProps {
 export default function ImageUploader({ name, initialImages = [] }: ImageUploaderProps) {
   const [files, setFiles] = useState<string[]>(initialImages);
   const [isUploading, setIsUploading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null); // Store URL of file being deleted
   const [hiddenInputValue, setHiddenInputValue] = useState(JSON.stringify(initialImages));
 
   useEffect(() => {
@@ -47,13 +49,23 @@ export default function ImageUploader({ name, initialImages = [] }: ImageUploade
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: { 'image/*': ['.jpeg', '.png', '.jpg', '.webp'] },
-    disabled: isUploading,
+    disabled: isUploading || !!isDeleting,
   });
 
-  const removeFile = (index: number) => {
-    // Note: This only removes from the client. It does not delete the file from Vercel Blob.
-    // A more robust solution would require a server action to delete the blob.
-    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+  const removeFile = async (url: string) => {
+    setIsDeleting(url);
+    try {
+      const result = await deleteImage(url);
+      if (result.error) {
+        throw new Error(result.error);
+      }
+      setFiles((prevFiles) => prevFiles.filter((fileUrl) => fileUrl !== url));
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      alert('No se pudo eliminar la imagen. Por favor, inténtalo de nuevo.');
+    } finally {
+      setIsDeleting(null);
+    }
   };
 
   return (
@@ -77,15 +89,16 @@ export default function ImageUploader({ name, initialImages = [] }: ImageUploade
       <input type="hidden" name={name} value={hiddenInputValue} />
 
       <div className="mt-4 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
-        {files.map((url, index) => (
-          <div key={index} className="relative">
-            <img src={url} alt={`Preview ${index}`} className="w-full h-24 object-cover rounded-lg" />
+        {files.map((url) => (
+          <div key={url} className="relative">
+            <img src={url} alt={`Preview ${url}`} className="w-full h-24 object-cover rounded-lg" />
             <button
               type="button"
-              onClick={() => removeFile(index)}
-              className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center -mt-2 -mr-2"
+              onClick={() => removeFile(url)}
+              disabled={isDeleting === url}
+              className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center -mt-2 -mr-2 disabled:bg-gray-400"
             >
-              &times;
+              {isDeleting === url ? '...' : '×'}
             </button>
           </div>
         ))}
