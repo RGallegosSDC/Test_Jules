@@ -89,3 +89,67 @@ export async function deleteCar(formData: FormData) {
   revalidatePath('/dashboard');
   revalidatePath('/admin/cars');
 }
+
+export async function updateCar(prevState: { message: string }, formData: FormData) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    return { message: 'No autorizado. Por favor, inicie sesión.' };
+  }
+
+  const carId = formData.get('carId') as string;
+  if (!carId) {
+    return { message: 'ID del auto no encontrado.' };
+  }
+
+  // Authorization check
+  const car = await prisma.car.findUnique({
+    where: { id: carId },
+    select: { clientId: true },
+  });
+
+  if (!car) {
+    return { message: 'Auto no encontrado.' };
+  }
+
+  // @ts-ignore
+  const userIsOwner = car.clientId === session.user.clientId;
+  // @ts-ignore
+  const userIsSuperAdmin = session.user.role === 'SUPERADMIN';
+
+  if (!userIsOwner && !userIsSuperAdmin) {
+    return { message: 'Permiso denegado para editar este auto.' };
+  }
+
+  // Data validation and processing
+  const make = formData.get('make') as string;
+  const model = formData.get('model') as string;
+  const year = Number(formData.get('year'));
+  const price = Number(formData.get('price'));
+  const description = formData.get('description') as string;
+  const images = (formData.get('images') as string).split(',').map(url => url.trim()).filter(url => url);
+
+  if (!make || !model || !year || !price || !description) {
+    return { message: 'Todos los campos marcados con * son obligatorios.' };
+  }
+
+  try {
+    await prisma.car.update({
+      where: { id: carId },
+      data: {
+        make,
+        model,
+        year,
+        price,
+        description,
+        images: JSON.stringify(images),
+      },
+    });
+  } catch (e) {
+    console.error(e);
+    return { message: 'Error al actualizar el auto en la base de datos.' };
+  }
+
+  revalidatePath('/dashboard');
+  revalidatePath(`/dashboard/cars/${carId}/edit`);
+  redirect('/dashboard');
+}
