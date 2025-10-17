@@ -95,6 +95,10 @@ model Car {
   description   String
   images        String // Stored as a JSON string: '["url1", "url2"]'
 
+  // SEO Fields
+  seoTitle      String?
+  seoDescription String?
+
   client        Client    @relation(fields: [clientId], references: [id])
   clientId      String
 

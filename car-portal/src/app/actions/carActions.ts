@@ -65,6 +65,32 @@ export async function createCar(prevState: { message: string }, formData: FormDa
       data: { carModelInfoId: carModelInfo.id },
     });
 
+    // --- SEO Content Generation Step ---
+    console.log(`Generating SEO content for ${newCar.make} ${newCar.model}...`);
+    const seoPrompt = `
+      Eres un especialista en SEO para un portal de venta de autos.
+      Para el siguiente vehículo, genera un 'title' (máximo 60 caracteres) y una 'description' (máximo 160 caracteres) optimizados para motores de búsqueda.
+
+      Vehículo: ${newCar.make} ${newCar.model} ${newCar.year}
+      Descripción: ${newCar.description}
+
+      Responde únicamente con un objeto JSON con las claves "seoTitle" y "seoDescription".
+    `;
+    const seoContentRaw = await generateText(seoPrompt);
+    try {
+      const seoContent = JSON.parse(seoContentRaw.replace(/```json/g, '').replace(/```/g, '').trim());
+      await prisma.car.update({
+        where: { id: newCar.id },
+        data: {
+          seoTitle: seoContent.seoTitle,
+          seoDescription: seoContent.seoDescription,
+        },
+      });
+    } catch (seoError) {
+      console.error("Could not parse SEO content from AI:", seoError);
+      // Non-critical error, so we don't block the car creation
+    }
+
   } catch (e) {
     console.error(e);
     return { message: 'Error al crear el auto en la base de datos.' };

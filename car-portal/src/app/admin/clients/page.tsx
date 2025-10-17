@@ -54,6 +54,9 @@ export default async function ManageClientsPage() {
                   <div className="text-sm text-gray-500">{new Date(client.createdAt).toLocaleDateString()}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <Link href={`/admin/clients/${client.id}/edit`} className="text-indigo-600 hover:text-indigo-900 mr-4">
+                    Editar
+                  </Link>
                   <form action={deleteClient} className="inline-block">
                     <input type="hidden" name="clientId" value={client.id} />
                     <button type="submit" className="text-red-600 hover:text-red-900">

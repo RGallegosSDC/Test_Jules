@@ -93,3 +93,48 @@ export async function deleteClient(formData: FormData) {
 
     revalidatePath('/admin/clients');
 }
+
+export async function updateClient(prevState: { message: string }, formData: FormData) {
+  const session = await getServerSession(authOptions);
+  if (session?.user?.role !== UserRole.SUPERADMIN) {
+    return { message: 'No autorizado.' };
+  }
+
+  const clientId = formData.get('clientId') as string;
+  const userId = formData.get('userId') as string;
+  const name = formData.get('name') as string;
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+
+  if (!clientId || !userId || !name || !email) {
+    return { message: 'Faltan datos requeridos.' };
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      // Update client name
+      await tx.client.update({
+        where: { id: clientId },
+        data: { name },
+      });
+
+      // Prepare user data
+      const userData: { email: string; password?: string } = { email };
+      if (password) {
+        userData.password = await bcrypt.hash(password, 10);
+      }
+
+      // Update user details
+      await tx.user.update({
+        where: { id: userId },
+        data: userData,
+      });
+    });
+  } catch (e) {
+    console.error(e);
+    return { message: 'Error al actualizar el cliente.' };
+  }
+
+  revalidatePath('/admin/clients');
+  redirect('/admin/clients');
+}

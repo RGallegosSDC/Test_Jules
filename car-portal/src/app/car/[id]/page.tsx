@@ -1,8 +1,41 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import type { Metadata, ResolvingMetadata } from 'next';
+
+type Props = {
+  params: { id: string };
+};
+
+// This function generates dynamic metadata for the page
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  // fetch data
+  const car = await prisma.car.findUnique({
+    where: { id: params.id },
+    select: { make: true, model: true, year: true, seoTitle: true, seoDescription: true },
+  });
+
+  if (!car) {
+    return {
+      title: 'Auto no encontrado',
+      description: 'El auto que buscas no está disponible.',
+    };
+  }
+
+  const defaultTitle = `${car.make} ${car.model} ${car.year} en Venta`;
+  const defaultDescription = `Mira este increíble ${car.make} ${car.model} del año ${car.year}. ¡Disponible ahora en nuestro portal!`;
+
+  return {
+    title: car.seoTitle || defaultTitle,
+    description: car.seoDescription || defaultDescription,
+  };
+}
+
 
 // This is the main component for the car detail page
-export default async function CarDetailPage({ params }: { params: { id: string } }) {
+export default async function CarDetailPage({ params }: Props) {
   // Fetch the specific car from the database, including the AI-generated info
   const car = await prisma.car.findUnique({
     where: { id: params.id },
