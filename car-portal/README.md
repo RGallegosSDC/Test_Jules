@@ -8,10 +8,10 @@ Este es el repositorio para un portal de venta de autos multicliente, moderno y 
     *   **Super Administrador:** Tiene acceso a un panel privado para ver todos los clientes y todos los autos de la plataforma.
     *   **Administrador de Cliente:** Cada cliente (concesionario) tiene sus propios usuarios administradores que pueden gestionar su inventario.
 *   **Portal Público:** Una página de inicio que muestra todos los autos y páginas de detalle para cada vehículo.
-*   **Contenido Enriquecido (Prueba de Concepto):** La página de detalle del auto muestra información adicional como "Sabías que...", comentarios positivos y estadísticas. Actualmente, estos datos se cargan desde la base de datos (a partir del script de seeding).
-*   **Autenticación Segura:** Sistema de inicio de sesión robusto implementado con NextAuth.js.
-*   **Panel de Cliente:** Un dashboard protegido donde los clientes pueden ver y añadir nuevos autos a su inventario.
-*   **Funcionalidad de Eliminar Autos:** Tanto los clientes como el superadministrador pueden eliminar listados de autos.
+*   **Contenido Enriquecido (Prueba de Concepto de IA):** Integración con la API de Google Gemini para generar dinámicamente "Sabías que...", comentarios y estadísticas la primera vez que se añade un nuevo modelo de auto.
+*   **Carga de Imágenes (Prueba de Concepto):** Sistema de carga de imágenes basado en arrastrar y soltar que convierte los archivos a Base64 para un almacenamiento sin coste en la base de datos.
+*   **Marketing Automatizado (Prueba de Concepto):** Herramienta de IA para generar borradores de publicaciones para redes sociales a partir de los datos de un auto.
+*   **Gestión de Clientes y Autos (CRUD):** Funcionalidades completas para que los clientes gestionen sus autos (crear, editar, eliminar) y para que el superadministrador gestione a los clientes (crear, eliminar).
 
 ## Stack Tecnológico
 

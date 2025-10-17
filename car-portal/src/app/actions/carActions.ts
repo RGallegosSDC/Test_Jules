@@ -5,11 +5,11 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { generateCarModelInfo, generateText } from '@/lib/ai';
 
 export async function createCar(prevState: { message: string }, formData: FormData) {
   const session = await getServerSession(authOptions);
-  // @ts-ignore
-  if (!session || !session.user?.clientId) {
+  if (!session?.user?.clientId) {
     return { message: 'No autorizado. Por favor, inicie sesión.' };
   }
 
@@ -25,20 +25,46 @@ export async function createCar(prevState: { message: string }, formData: FormDa
   }
 
   try {
-    // @ts-ignore
     const clientId = session.user.clientId;
 
-    await prisma.car.create({
+    const newCar = await prisma.car.create({
       data: {
         make,
         model,
         year,
         price,
         description,
-        images: JSON.stringify(images), // Store images as a JSON string
+        images: JSON.stringify(images),
         clientId,
       },
     });
+
+    // --- AI Content Generation Step ---
+    const modelKey = `${make.toUpperCase()}_${model.toUpperCase()}_${year}`;
+    let carModelInfo = await prisma.carModelInfo.findUnique({
+      where: { modelKey },
+    });
+
+    if (!carModelInfo) {
+      console.log(`Generating new AI content for ${modelKey}...`);
+      const aiContent = await generateCarModelInfo(make, model);
+
+      carModelInfo = await prisma.carModelInfo.create({
+        data: {
+          modelKey,
+          funFacts: JSON.stringify(aiContent.funFacts),
+          positiveComments: JSON.stringify(aiContent.positiveComments),
+          statistics: JSON.stringify(aiContent.statistics),
+        },
+      });
+    }
+
+    // Link the AI content to the new car
+    await prisma.car.update({
+      where: { id: newCar.id },
+      data: { carModelInfoId: carModelInfo.id },
+    });
+
   } catch (e) {
     console.error(e);
     return { message: 'Error al crear el auto en la base de datos.' };
@@ -72,9 +98,7 @@ export async function deleteCar(formData: FormData) {
 
   // Check permissions: SUPERADMIN can delete any car,
   // CLIENT_ADMIN can only delete their own cars.
-  // @ts-ignore
   const userIsSuperAdmin = session.user.role === 'SUPERADMIN';
-  // @ts-ignore
   const userIsOwner = car.clientId === session.user.clientId;
 
   if (!userIsSuperAdmin && !userIsOwner) {
@@ -111,9 +135,7 @@ export async function updateCar(prevState: { message: string }, formData: FormDa
     return { message: 'Auto no encontrado.' };
   }
 
-  // @ts-ignore
   const userIsOwner = car.clientId === session.user.clientId;
-  // @ts-ignore
   const userIsSuperAdmin = session.user.role === 'SUPERADMIN';
 
   if (!userIsOwner && !userIsSuperAdmin) {
@@ -152,4 +174,45 @@ export async function updateCar(prevState: { message: string }, formData: FormDa
   revalidatePath('/dashboard');
   revalidatePath(`/dashboard/cars/${carId}/edit`);
   redirect('/dashboard');
+}
+
+export async function generateMarketingPost(carId: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    return { error: 'No autorizado' };
+  }
+
+  const car = await prisma.car.findUnique({
+    where: { id: carId },
+  });
+
+  if (!car) {
+    return { error: 'Auto no encontrado' };
+  }
+
+  // Authorization check
+  const userIsOwner = car.clientId === session.user.clientId;
+  const userIsSuperAdmin = session.user.role === 'SUPERADMIN';
+
+  if (!userIsOwner && !userIsSuperAdmin) {
+    return { error: 'Permiso denegado' };
+  }
+
+  const prompt = `
+    Eres un experto en marketing de redes sociales para concesionarios de autos.
+    Tu tarea es crear una publicación corta, emocionante y atractiva para Instagram sobre el siguiente vehículo.
+
+    Vehículo:
+    - Marca: ${car.make}
+    - Modelo: ${car.model}
+    - Año: ${car.year}
+    - Precio: $${car.price.toLocaleString()}
+    - Descripción: ${car.description}
+
+    La publicación debe ser en español, usar un tono entusiasta, incluir emojis relevantes y terminar con un llamado a la acción claro para que los interesados envíen un mensaje directo o visiten el concesionario. Incluye hashtags populares y relevantes.
+  `;
+
+  const postText = await generateText(prompt);
+
+  return { success: postText };
 }

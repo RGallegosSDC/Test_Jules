@@ -4,23 +4,19 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { deleteCar } from '@/app/actions/carActions';
+import MarketingButton from '@/components/MarketingButton';
 
 // This is a server component, so we can fetch data directly
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
 
-  // Protect the route
-  // @ts-ignore
-  if (!session || !session.user?.clientId) {
+  if (!session?.user?.clientId) {
     redirect('/auth/signin?callbackUrl=/dashboard');
   }
 
-  // Fetch cars that belong to the logged-in client
-  // @ts-ignore
-  const clientId = session.user.clientId;
   const cars = await prisma.car.findMany({
     where: {
-      clientId: clientId,
+      clientId: session.user.clientId,
     },
     orderBy: {
       createdAt: 'desc',
@@ -46,6 +42,7 @@ export default async function DashboardPage() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca y Modelo</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Año</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Marketing IA</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
             </tr>
           </thead>
@@ -61,9 +58,12 @@ export default async function DashboardPage() {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">${car.price.toLocaleString()}</div>
                 </td>
+                <td className="px-6 py-4 whitespace-nowrap text-center">
+                  <MarketingButton carId={car.id} />
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <Link href={`/dashboard/cars/${car.id}/edit`} className="text-indigo-600 hover:text-indigo-900 mr-4">
-                    Editar (Próximamente)
+                    Editar
                   </Link>
                   <form action={deleteCar} className="inline-block">
                     <input type="hidden" name="carId" value={car.id} />

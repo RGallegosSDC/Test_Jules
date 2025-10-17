@@ -12,8 +12,7 @@ export default async function AdminLayout({
   const session = await getServerSession(authOptions);
 
   // Protect the entire admin area
-  // @ts-ignore
-  if (!session || session.user?.role !== UserRole.SUPERADMIN) {
+  if (session?.user?.role !== UserRole.SUPERADMIN) {
     // Redirect to home page or a 'not authorized' page if not a superadmin
     redirect('/');
   }

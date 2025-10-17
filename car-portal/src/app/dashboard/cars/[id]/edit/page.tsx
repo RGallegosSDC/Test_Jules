@@ -26,9 +26,7 @@ export default async function EditCarPage({ params }: { params: { id: string } }
   }
 
   // Authorization check: only the owner or a superadmin can edit
-  // @ts-ignore
   const userIsOwner = car.clientId === session.user.clientId;
-  // @ts-ignore
   const userIsSuperAdmin = session.user.role === UserRole.SUPERADMIN;
 
   if (!userIsOwner && !userIsSuperAdmin) {

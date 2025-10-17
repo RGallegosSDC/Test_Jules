@@ -1,7 +1,8 @@
 'use client';
 
 import { useFormState } from 'react-dom';
-import { createCar } from '@/app/actions/carActions'; // We will create this action next
+import { createCar } from '@/app/actions/carActions';
+import ImageUploader from '@/components/ImageUploader';
 
 const initialState = {
   message: '',
@@ -43,8 +44,8 @@ export default function NewCarPage() {
         </div>
 
         <div>
-          <label htmlFor="images" className="block text-sm font-medium text-gray-700">URLs de Imágenes (separadas por comas)</label>
-          <input type="text" name="images" id="images" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+          <label htmlFor="images" className="block text-sm font-medium text-gray-700">Imágenes</label>
+          <ImageUploader name="images" />
         </div>
 
         {state.message && (

@@ -33,10 +33,21 @@ export default async function CarDetailPage({ params }: { params: { id: string }
     <main className="container mx-auto p-4">
       <div className="bg-white shadow-lg rounded-lg overflow-hidden">
         {/* Image Gallery */}
-        <div className="p-4 bg-gray-200">
-           <div className="w-full h-96 bg-gray-300 flex items-center justify-center">
-             <span className="text-gray-500">Imagen Principal del Auto</span>
-           </div>
+        <div className="p-4">
+          <div className="w-full h-96 bg-gray-200 flex items-center justify-center mb-4 rounded-lg">
+            {images.length > 0 ? (
+              <img src={images[0]} alt={`${car.make} ${car.model}`} className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-gray-500">Imagen no disponible</span>
+            )}
+          </div>
+          <div className="grid grid-cols-5 gap-2">
+            {images.slice(1).map((img: string, i: number) => (
+              <div key={i} className="h-24 bg-gray-200 flex items-center justify-center rounded-lg">
+                <img src={img} alt={`Thumbnail ${i + 1}`} className="w-full h-full object-cover rounded-lg" />
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="p-6">

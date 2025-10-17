@@ -58,25 +58,18 @@ export const authOptions: AuthOptions = {
     // This callback is called whenever a JWT is created or updated.
     async jwt({ token, user }) {
       // On initial sign in, `user` object is available.
-      // We are adding custom properties to the token.
       if (user) {
         token.id = user.id;
-        // @ts-ignore
         token.role = user.role;
-        // @ts-ignore
         token.clientId = user.clientId;
       }
       return token;
     },
-    // This callback is called whenever a session is checked.
     async session({ session, token }) {
       // We are adding the custom properties from the token to the session object.
       if (token && session.user) {
-        // @ts-ignore
         session.user.id = token.id;
-        // @ts-ignore
         session.user.role = token.role;
-        // @ts-ignore
         session.user.clientId = token.clientId;
       }
       return session;
