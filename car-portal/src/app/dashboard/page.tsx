@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { deleteCar } from '@/app/actions/carActions';
 import MarketingButton from '@/components/MarketingButton';
+import { createCheckoutSession } from '@/app/actions/stripeActions';
 
 // This is a server component, so we can fetch data directly
 export default async function DashboardPage() {
@@ -14,25 +15,55 @@ export default async function DashboardPage() {
     redirect('/auth/signin?callbackUrl=/dashboard');
   }
 
-  const cars = await prisma.car.findMany({
-    where: {
-      clientId: session.user.clientId,
-    },
-    orderBy: {
-      createdAt: 'desc',
+  const client = await prisma.client.findUnique({
+    where: { id: session.user.clientId },
+    include: {
+      cars: {
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
     },
   });
 
+  if (!client) {
+    return <div>Cliente no encontrado.</div>;
+  }
+
+  const cars = client.cars;
+  const isSubscribed = client.subscriptionStatus === 'active';
+
   return (
     <div className="container mx-auto p-4">
+      {!isSubscribed && (
+        <div className="p-4 mb-6 text-yellow-800 bg-yellow-100 border-l-4 border-yellow-500 rounded-r-lg">
+          <h2 className="font-bold">Cuenta Inactiva</h2>
+          <p className="mb-2">Tu cuenta no tiene una suscripción activa. Por favor, activa tu cuenta para poder añadir nuevos autos.</p>
+          <form action={createCheckoutSession}>
+            <button type="submit" className="px-4 py-2 font-semibold bg-green-500 text-white rounded-md hover:bg-green-600">
+              Activar Cuenta Ahora
+            </button>
+          </form>
+        </div>
+      )}
+
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Mis Autos</h1>
-        <Link
-          href="/dashboard/cars/new"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-        >
-          + Añadir Auto Nuevo
-        </Link>
+        {isSubscribed ? (
+          <Link
+            href="/dashboard/cars/new"
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            + Añadir Auto Nuevo
+          </Link>
+        ) : (
+           <button
+            disabled
+            className="px-4 py-2 bg-gray-400 text-white rounded-md cursor-not-allowed"
+          >
+            + Añadir Auto Nuevo
+          </button>
+        )}
       </div>
 
       <div className="bg-white shadow-md rounded-lg">

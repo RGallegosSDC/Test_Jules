@@ -1,66 +1,32 @@
-'use client';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { prisma } from '@/lib/prisma';
+import { redirect } from 'next/navigation';
+import NewCarForm from '@/components/NewCarForm';
 
-import { useFormState } from 'react-dom';
-import { createCar } from '@/app/actions/carActions';
-import ImageUploader from '@/components/ImageUploader';
+// This server component checks for an active subscription before rendering the form.
+export default async function NewCarPage() {
+  const session = await getServerSession(authOptions);
 
-const initialState = {
-  message: '',
-};
+  if (!session?.user?.clientId) {
+    redirect('/auth/signin');
+  }
 
-export default function NewCarPage() {
-  const [state, formAction] = useFormState(createCar, initialState);
+  const client = await prisma.client.findUnique({
+    where: { id: session.user.clientId },
+    select: { subscriptionStatus: true },
+  });
 
-  return (
-    <div className="container mx-auto p-4 max-w-2xl">
-      <h1 className="text-3xl font-bold mb-6">Añadir Nuevo Auto</h1>
-
-      <form action={formAction} className="bg-white p-8 rounded-lg shadow-md space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label htmlFor="make" className="block text-sm font-medium text-gray-700">Marca</label>
-            <input type="text" name="make" id="make" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
-          </div>
-          <div>
-            <label htmlFor="model" className="block text-sm font-medium text-gray-700">Modelo</label>
-            <input type="text" name="model" id="model" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
-          </div>
+  if (client?.subscriptionStatus !== 'active') {
+    return (
+      <div className="container mx-auto p-4 max-w-2xl">
+        <div className="p-4 text-center text-red-800 bg-red-100 border border-red-400 rounded-lg">
+          <h1 className="text-2xl font-bold">Acceso Denegado</h1>
+          <p>Necesitas una suscripción activa para añadir un nuevo auto.</p>
         </div>
+      </div>
+    );
+  }
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label htmlFor="year" className="block text-sm font-medium text-gray-700">Año</label>
-            <input type="number" name="year" id="year" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
-          </div>
-          <div>
-            <label htmlFor="price" className="block text-sm font-medium text-gray-700">Precio ($)</label>
-            <input type="number" name="price" id="price" step="0.01" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
-          </div>
-        </div>
-
-        <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">Descripción</label>
-          <textarea name="description" id="description" rows={4} required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
-        </div>
-
-        <div>
-          <label htmlFor="images" className="block text-sm font-medium text-gray-700">Imágenes</label>
-          <ImageUploader name="images" />
-        </div>
-
-        {state.message && (
-          <p className="text-sm text-red-600">{state.message}</p>
-        )}
-
-        <div className="flex justify-end space-x-4">
-           <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-            Guardar Auto
-          </button>
-           <a href="/dashboard" className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">
-            Cancelar
-          </a>
-        </div>
-      </form>
-    </div>
-  );
+  return <NewCarForm />;
 }

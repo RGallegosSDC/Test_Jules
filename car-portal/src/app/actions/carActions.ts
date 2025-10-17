@@ -13,6 +13,14 @@ export async function createCar(prevState: { message: string }, formData: FormDa
     return { message: 'No autorizado. Por favor, inicie sesión.' };
   }
 
+  const client = await prisma.client.findUnique({
+    where: { id: session.user.clientId },
+  });
+
+  if (client?.subscriptionStatus !== 'active') {
+    return { message: 'Necesitas una suscripción activa para crear un auto.' };
+  }
+
   const make = formData.get('make') as string;
   const model = formData.get('model') as string;
   const year = Number(formData.get('year'));
