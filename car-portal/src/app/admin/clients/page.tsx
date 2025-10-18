@@ -34,6 +34,7 @@ export default async function ManageClientsPage() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre del Cliente</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email del Admin</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Autos Listados</th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Suscripción</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de Registro</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
             </tr>
@@ -50,6 +51,15 @@ export default async function ManageClientsPage() {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">{client._count.cars}</div>
                 </td>
+                <td className="px-6 py-4 whitespace-nowrap text-center">
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                    client.subscriptionStatus === 'active'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {client.subscriptionStatus ?? 'Inactiva'}
+                  </span>
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-500">{new Date(client.createdAt).toLocaleDateString()}</div>
                 </td>
@@ -57,12 +67,22 @@ export default async function ManageClientsPage() {
                   <Link href={`/admin/clients/${client.id}/edit`} className="text-indigo-600 hover:text-indigo-900 mr-4">
                     Editar
                   </Link>
-                  <form action={deleteClient} className="inline-block">
+                  <form action={deleteClient} className="inline-block mr-4">
                     <input type="hidden" name="clientId" value={client.id} />
                     <button type="submit" className="text-red-600 hover:text-red-900">
                       Eliminar
                     </button>
                   </form>
+                  {client.stripeCustomerId && (
+                    <a
+                      href={`https://dashboard.stripe.com/customers/${client.stripeCustomerId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-purple-600 hover:text-purple-900"
+                    >
+                      Ver en Stripe
+                    </a>
+                  )}
                 </td>
               </tr>
             ))}
