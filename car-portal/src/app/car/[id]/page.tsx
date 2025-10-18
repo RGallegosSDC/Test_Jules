@@ -89,33 +89,18 @@ export default async function CarDetailPage({ params }: Props) {
           <p className="text-2xl font-semibold text-blue-600 mb-4">${car.price.toLocaleString()}</p>
           <p className="text-lg text-gray-700 mb-6">{car.description}</p>
 
+import FunFactCard from '@/components/ai/FunFactCard';
+import ExpertReview from '@/components/ai/ExpertReview';
+import StatsHighlight from '@/components/ai/StatsHighlight';
+
           {/* AI-Generated Content Section */}
           {car.carModelInfo && (
-            <div className="mt-8 p-6 bg-gray-50 rounded-lg">
-              <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Lo que no sabías de tu próximo auto</h2>
-
-              {/* Fun Facts */}
-              <div className="mb-6">
-                <h3 className="text-xl font-semibold mb-3 text-blue-700">Sabías que...</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600">
-                  {funFacts.map((fact: string, i: number) => <li key={i}>{fact}</li>)}
-                </ul>
-              </div>
-
-              {/* Positive Comments */}
-              <div className="mb-6">
-                <h3 className="text-xl font-semibold mb-3 text-green-700">Nuestros expertos dicen...</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600">
-                  {positiveComments.map((comment: string, i: number) => <li key={i}>{comment}</li>)}
-                </ul>
-              </div>
-
-              {/* Statistics */}
-              <div>
-                <h3 className="text-xl font-semibold mb-3 text-purple-700">Estadísticas Clave</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600">
-                  {statistics.map((stat: string, i: number) => <li key={i}>{stat}</li>)}
-                </ul>
+            <div className="mt-10 pt-8 border-t border-gray-200">
+              <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">Análisis por IA de nuestro portal</h2>
+              <div className="space-y-8">
+                <FunFactCard facts={funFacts} />
+                <ExpertReview comments={positiveComments} />
+                <StatsHighlight stats={statistics} />
               </div>
             </div>
           )}
