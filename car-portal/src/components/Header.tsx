@@ -17,7 +17,7 @@ export default function Header() {
   return (
     <header className="bg-white shadow-md">
       <nav className="container mx-auto px-4 py-3 flex justify-between items-center">
-        <Link href="/" className="text-2xl font-bold text-blue-600">
+        <Link href="/" className="text-2xl font-bold text-primary">
           CarPortal
         </Link>
         <div className="flex items-center space-x-4">
@@ -25,7 +25,7 @@ export default function Header() {
             <div className="text-gray-500">Cargando...</div>
           ) : session ? (
             <>
-              <Link href="/dashboard" className="text-gray-700 hover:text-blue-600">
+              <Link href="/dashboard" className="text-gray-700 hover:text-primary">
                 Dashboard
               </Link>
               <span className="text-gray-700">Hola, {session.user?.name ?? session.user?.email}</span>
@@ -39,7 +39,7 @@ export default function Header() {
           ) : (
             <button
               onClick={() => signIn()}
-              className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              className="px-3 py-1 bg-primary text-white rounded-md hover:opacity-90"
             >
               Iniciar Sesión
             </button>

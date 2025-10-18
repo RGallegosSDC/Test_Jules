@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from './AuthProvider';
 import Header from '@/components/Header';
+import Chatbot from '@/components/chatbot/Chatbot';
+import { prisma } from '@/lib/prisma';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -19,19 +21,26 @@ export const metadata: Metadata = {
   description: 'El portal de venta de autos del futuro',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const themeSettings = await prisma.themeSettings.findUnique({
+    where: { singleton: true },
+  });
+  const primaryColor = themeSettings?.primaryColor || '#3B82F6';
+
   return (
     <html lang="es">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        style={{ '--primary-color': primaryColor } as React.CSSProperties}
       >
         <AuthProvider>
           <Header />
           <main>{children}</main>
+          <Chatbot />
         </AuthProvider>
       </body>
     </html>

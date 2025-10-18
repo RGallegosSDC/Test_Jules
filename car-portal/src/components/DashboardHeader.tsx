@@ -25,7 +25,7 @@ export default function DashboardHeader({ isSubscribed }: DashboardHeaderProps) 
            <h2 className="font-bold">Suscripción Activa</h2>
            <p className="mb-2">Gracias por ser un miembro activo. Puedes gestionar tu suscripción y facturación en cualquier momento.</p>
            <form action={createCustomerPortalSession}>
-            <button type="submit" className="px-4 py-2 font-semibold bg-blue-500 text-white rounded-md hover:bg-blue-600">
+            <button type="submit" className="px-4 py-2 font-semibold bg-primary text-white rounded-md hover:opacity-90">
               Gestionar Suscripción y Facturación
             </button>
           </form>
@@ -37,7 +37,7 @@ export default function DashboardHeader({ isSubscribed }: DashboardHeaderProps) 
         {isSubscribed ? (
           <Link
             href="/dashboard/cars/new"
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="px-4 py-2 bg-primary text-white rounded-md hover:opacity-90"
           >
             + Añadir Auto Nuevo
           </Link>

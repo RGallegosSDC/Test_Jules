@@ -4,6 +4,7 @@ import type { Metadata, ResolvingMetadata } from 'next';
 import FunFactCard from '@/components/ai/FunFactCard';
 import ExpertReview from '@/components/ai/ExpertReview';
 import StatsHighlight from '@/components/ai/StatsHighlight';
+import ReviewsSection from '@/components/ReviewsSection';
 
 type Props = {
   params: { id: string };
@@ -44,6 +45,17 @@ export default async function CarDetailPage({ params }: Props) {
     where: { id: params.id },
     include: {
       carModelInfo: true, // Incluye el contenido de IA relacionado
+      comments: {
+        include: {
+          user: {
+            select: { name: true, email: true }, // Solo selecciona los datos públicos del usuario
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
+      ratings: true,
     },
   });
 
@@ -103,6 +115,8 @@ export default async function CarDetailPage({ params }: Props) {
               </div>
             </div>
           )}
+
+          <ReviewsSection comments={car.comments} ratings={car.ratings} carId={car.id} />
         </div>
 
         <div className="p-6 bg-gray-100 border-t">

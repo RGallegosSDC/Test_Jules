@@ -1,0 +1,140 @@
+datasource db {
+  provider     = "postgresql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String    @id @default(cuid())
+  name      String?
+  email     String    @unique
+  password  String
+  role      UserRole
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  client    Client?   @relation(fields: [clientId], references: [id])
+  clientId  String?
+
+  comments Comment[]
+  ratings  Rating[]
+  alerts    Alert[]
+
+  @@index([clientId])
+}
+
+model Client {
+  id                   String    @id @default(cuid())
+  name                 String    @unique
+  users                User[]
+  cars                 Car[]
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  // Stripe fields
+  stripeCustomerId     String?   @unique
+  subscriptionId       String?   @unique
+  subscriptionStatus   String?   // e.g., "active", "canceled", "past_due"
+}
+
+model Car {
+  id               String        @id @default(cuid())
+  make             String
+  model            String
+  year             Int
+  price            Float
+  description      String
+  images           String // JSON array of image URLs
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  clientId         String
+  client           Client        @relation(fields: [clientId], references: [id])
+
+  carModelInfoId   String?
+  carModelInfo     CarModelInfo? @relation(fields: [carModelInfoId], references: [id])
+
+  // SEO fields
+  seoTitle         String?
+  seoDescription   String?
+
+  comments Comment[]
+  ratings  Rating[]
+
+  @@index([clientId])
+  @@index([carModelInfoId])
+}
+
+model CarModelInfo {
+  id               String   @id @default(cuid())
+  modelKey         String   @unique // e.g., "TOYOTA_CAMRY_2023"
+  funFacts         String // JSON array of strings
+  positiveComments String // JSON array of strings
+  statistics       String // JSON array of strings
+
+  cars             Car[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  carId     String
+  car       Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([carId])
+  @@index([userId])
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  value     Int      // Value from 1 to 5
+  createdAt DateTime @default(now())
+
+  carId     String
+  car       Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([carId, userId]) // A user can only rate a car once
+  @@index([carId])
+  @@index([userId])
+}
+
+model Alert {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  make      String?
+  model     String?
+  maxPrice  Int?
+  minYear   Int?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model ThemeSettings {
+  id            String    @id @default(cuid())
+  singleton     Boolean   @unique @default(true) // Ensures only one row can exist
+  primaryColor  String    @default("#0000FF") // Default to blue
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum UserRole {
+  SUPERADMIN
+  CLIENT_ADMIN
+  USER // Regular user for comments/ratings/alerts
+}

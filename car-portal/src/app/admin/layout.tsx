@@ -38,6 +38,16 @@ export default async function AdminLayout({
                 Ver Todos los Autos
               </Link>
             </li>
+            <li className="mb-2">
+              <Link href="/admin/analytics" className="block p-2 rounded hover:bg-gray-700">
+                Análisis
+              </Link>
+            </li>
+            <li className="mb-2">
+              <Link href="/admin/theme" className="block p-2 rounded hover:bg-gray-700">
+                Tema
+              </Link>
+            </li>
              <li className="mb-2 mt-6">
               <Link href="/" className="block p-2 rounded hover:bg-gray-700">
                 &larr; Volver al Portal

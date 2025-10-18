@@ -99,6 +99,29 @@ export async function createCar(prevState: { message: string }, formData: FormDa
       // Error no crítico, así que no bloqueamos la creación del auto
     }
 
+    // --- Alert Notification Step ---
+    // Find alerts that match the newly created car
+    const matchingAlerts = await prisma.alert.findMany({
+        where: {
+            AND: [
+                { OR: [{ make: { equals: newCar.make, mode: 'insensitive' } }, { make: null }] },
+                { OR: [{ model: { equals: newCar.model, mode: 'insensitive' } }, { model: null }] },
+                { OR: [{ maxPrice: { gte: newCar.price } }, { maxPrice: null }] },
+                { OR: [{ minYear: { lte: newCar.year } }, { minYear: null }] },
+            ]
+        },
+        include: { user: { select: { email: true } } }
+    });
+
+    if (matchingAlerts.length > 0) {
+        console.log(`[+] Alerta de Auto Nuevo: ${matchingAlerts.length} usuarios notificados para el ${newCar.make} ${newCar.model}.`);
+        for (const alert of matchingAlerts) {
+            // In a real application, you would send an email here.
+            console.log(`  -> Simulando envío de email a: ${alert.user.email}`);
+        }
+    }
+
+
   } catch (e) {
     console.error(e);
     return { message: 'Error al crear el auto en la base de datos.' };
