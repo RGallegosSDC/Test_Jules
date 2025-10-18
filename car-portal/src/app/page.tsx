@@ -1,5 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import SearchForm from '@/components/SearchForm';
+import { Suspense } from 'react';
 
 // This component will display a single car card
 function CarCard({ car }: { car: any }) {
@@ -18,10 +20,48 @@ function CarCard({ car }: { car: any }) {
   );
 }
 
+import { Prisma } from '@prisma/client';
+
+interface HomePageProps {
+  searchParams: {
+    query?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    minYear?: string;
+    maxYear?: string;
+  };
+}
+
 // The main page component that fetches and displays all cars
-export default async function HomePage() {
-  // Fetch all cars from the database
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const { query, minPrice, maxPrice, minYear, maxYear } = searchParams;
+
+  const where: Prisma.CarWhereInput = {};
+
+  if (query) {
+    where.OR = [
+      { make: { contains: query, mode: 'insensitive' } },
+      { model: { contains: query, mode: 'insensitive' } },
+    ];
+  }
+
+  if (minPrice) {
+    where.price = { ...where.price, gte: parseInt(minPrice, 10) };
+  }
+  if (maxPrice) {
+    where.price = { ...where.price, lte: parseInt(maxPrice, 10) };
+  }
+
+  if (minYear) {
+    where.year = { ...where.year, gte: parseInt(minYear, 10) };
+  }
+  if (maxYear) {
+    where.year = { ...where.year, lte: parseInt(maxYear, 10) };
+  }
+
+  // Fetch cars from the database based on filters
   const cars = await prisma.car.findMany({
+    where,
     orderBy: {
       createdAt: 'desc',
     },
@@ -30,11 +70,20 @@ export default async function HomePage() {
   return (
     <main className="container mx-auto p-4">
       <h1 className="text-4xl font-bold text-center mb-8">Portal de Autos</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {cars.map((car) => (
-          <CarCard key={car.id} car={car} />
-        ))}
-      </div>
+
+      <Suspense fallback={<div>Cargando filtros...</div>}>
+        <SearchForm />
+      </Suspense>
+
+      {cars.length === 0 ? (
+        <p className="text-center text-gray-500 mt-8">No se encontraron autos con esos criterios.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
+          {cars.map((car) => (
+            <CarCard key={car.id} car={car} />
+          ))}
+        </div>
+      )}
     </main>
   );
 }
