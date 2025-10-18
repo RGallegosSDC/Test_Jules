@@ -8,15 +8,15 @@ import { AuthOptions } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 
 export const authOptions: AuthOptions = {
-  // Use Prisma to store sessions, users, etc.
-  // We are using JWT strategy, so adapter is not strictly needed for session storage,
-  // but it's good practice to have it for account linking in the future.
+  // Usa Prisma para almacenar sesiones, usuarios, etc.
+  // Estamos usando la estrategia JWT, por lo que el adaptador no es estrictamente necesario para el almacenamiento de sesiones,
+  // pero es una buena práctica tenerlo para la vinculación de cuentas en el futuro.
   adapter: PrismaAdapter(prisma as PrismaClient),
 
-  // Configure one or more authentication providers
+  // Configura uno o más proveedores de autenticación
   providers: [
     CredentialsProvider({
-      // The name to display on the sign in form (e.g. 'Sign in with...')
+      // El nombre que se mostrará en el formulario de inicio de sesión (por ejemplo, 'Iniciar sesión con...')
       name: 'Credentials',
       credentials: {
         email: { label: 'Email', type: 'text', placeholder: 'john.doe@example.com' },
@@ -32,7 +32,7 @@ export const authOptions: AuthOptions = {
         });
 
         if (user && await bcrypt.compare(credentials.password, user.password)) {
-          // Return a user object that will be encoded in the JWT
+          // Devuelve un objeto de usuario que será codificado en el JWT
           return {
             id: user.id,
             email: user.email,
@@ -41,23 +41,23 @@ export const authOptions: AuthOptions = {
             clientId: user.clientId,
           };
         } else {
-          // If you return null then an error will be displayed
+          // Si devuelves null, se mostrará un error
           return null;
         }
       },
     }),
   ],
 
-  // Use JWT for session management
+  // Usa JWT para la gestión de sesiones
   session: {
     strategy: 'jwt',
   },
 
-  // Callbacks are used to control what happens when an action is performed.
+  // Los callbacks se utilizan para controlar lo que sucede cuando se realiza una acción.
   callbacks: {
-    // This callback is called whenever a JWT is created or updated.
+    // Este callback se llama cada vez que se crea o actualiza un JWT.
     async jwt({ token, user }) {
-      // On initial sign in, `user` object is available.
+      // En el inicio de sesión inicial, el objeto `user` está disponible.
       if (user) {
         token.id = user.id;
         token.role = user.role;
@@ -66,7 +66,7 @@ export const authOptions: AuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      // We are adding the custom properties from the token to the session object.
+      // Añadimos las propiedades personalizadas del token al objeto de sesión.
       if (token && session.user) {
         session.user.id = token.id;
         session.user.role = token.role;
@@ -76,13 +76,13 @@ export const authOptions: AuthOptions = {
     },
   },
 
-  // Specify pages to override the default NextAuth pages
+  // Especifica las páginas para anular las páginas predeterminadas de NextAuth
   pages: {
-    signIn: '/auth/signin', // We will create this page later
+    signIn: '/auth/signin', // Crearemos esta página más tarde
   },
 
-  // Secret for JWT signing and encryption.
-  // It's automatically read from the NEXTAUTH_SECRET environment variable.
+  // Secreto para la firma y encriptación de JWT.
+  // Se lee automáticamente de la variable de entorno NEXTAUTH_SECRET.
   secret: process.env.NEXTAUTH_SECRET,
 };
 

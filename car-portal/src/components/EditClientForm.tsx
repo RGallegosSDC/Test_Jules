@@ -1,7 +1,7 @@
 'use client';
 
 import { useFormState } from 'react-dom';
-import { updateClient } from '@/app/actions/clientActions'; // This action will be created next
+import { updateClient } from '@/app/actions/clientActions'; // Esta acción se creará a continuación
 import type { Client, User } from '@prisma/client';
 import Link from 'next/link';
 

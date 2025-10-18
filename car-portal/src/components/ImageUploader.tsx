@@ -12,7 +12,7 @@ interface ImageUploaderProps {
 export default function ImageUploader({ name, initialImages = [] }: ImageUploaderProps) {
   const [files, setFiles] = useState<string[]>(initialImages);
   const [isUploading, setIsUploading] = useState(false);
-  const [isDeleting, setIsDeleting] = useState<string | null>(null); // Store URL of file being deleted
+  const [isDeleting, setIsDeleting] = useState<string | null>(null); // Almacena la URL del archivo que se está eliminando
   const [hiddenInputValue, setHiddenInputValue] = useState(JSON.stringify(initialImages));
 
   useEffect(() => {

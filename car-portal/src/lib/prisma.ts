@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 
-// This setup prevents creating too many Prisma Client instances in development
-// due to Next.js hot-reloading.
+// Esta configuración evita crear demasiadas instancias de Prisma Client en desarrollo
+// debido a la recarga en caliente (hot-reloading) de Next.js.
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;

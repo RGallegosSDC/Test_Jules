@@ -7,7 +7,7 @@ import { deleteCar } from '@/app/actions/carActions';
 import MarketingButton from '@/components/MarketingButton';
 import DashboardHeader from '@/components/DashboardHeader';
 
-// This is a server component, so we can fetch data directly
+// Este es un componente de servidor, por lo que podemos buscar datos directamente
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
 

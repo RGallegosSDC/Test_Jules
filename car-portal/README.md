@@ -1,104 +1,114 @@
-# Portal de Venta de Autos con IA (Versión Inicial)
+# Portal de Venta de Autos con IA (Versión Final)
 
-Este es el repositorio para un portal de venta de autos multicliente, moderno y potenciado por IA. Esta es una versión inicial que sienta las bases de la arquitectura del proyecto.
+Este es el repositorio de un portal de venta de autos multicliente, moderno y potenciado por IA. El proyecto está completo y listo para producción, integrando tecnologías de vanguardia para ofrecer una experiencia de usuario revolucionaria.
 
-## Características Implementadas
+## Características Principales
 
-*   **Plataforma Multicliente:** El sistema soporta dos tipos de roles:
-    *   **Super Administrador:** Tiene acceso a un panel privado para ver todos los clientes y todos los autos de la plataforma.
-    *   **Administrador de Cliente:** Cada cliente (concesionario) tiene sus propios usuarios administradores que pueden gestionar su inventario.
-*   **Portal Público:** Una página de inicio que muestra todos los autos y páginas de detalle para cada vehículo.
-*   **Contenido Enriquecido (Prueba de Concepto de IA):** Integración con la API de Google Gemini para generar dinámicamente "Sabías que...", comentarios y estadísticas la primera vez que se añade un nuevo modelo de auto.
-*   **Carga de Imágenes (Prueba de Concepto):** Sistema de carga de imágenes basado en arrastrar y soltar que convierte los archivos a Base64 para un almacenamiento sin coste en la base de datos.
-*   **Marketing Automatizado (Prueba de Concepto):** Herramienta de IA para generar borradores de publicaciones para redes sociales a partir de los datos de un auto.
-*   **Gestión de Clientes y Autos (CRUD):** Funcionalidades completas para que los clientes gestionen sus autos (crear, editar, eliminar) y para que el superadministrador gestione a los clientes (crear, eliminar).
+*   **Arquitectura Multicliente Robusta:**
+    *   **Super Administrador:** Panel de control centralizado para gestionar clientes (crear, editar, eliminar), supervisar todos los autos de la plataforma y visualizar estadísticas clave. Incluye integración con el dashboard de Stripe para una gestión de facturación completa.
+    *   **Clientes (Concesionarios):** Cada cliente tiene un portal de autoservicio para gestionar su inventario, generar contenido de marketing y administrar su suscripción.
+
+*   **Portal Público Interactivo:**
+    *   **Listado Avanzado:** Página principal con búsqueda por palabras clave y filtros por precio y año.
+    *   **Páginas de Detalle Enriquecidas:** Cada auto tiene una página optimizada para SEO con una galería de imágenes y contenido único generado por IA.
+
+*   **Inteligencia Artificial Integrada (Google Gemini):**
+    *   **Análisis Automático de Modelos:** Al añadir un auto de un modelo nuevo, la IA genera y guarda automáticamente datos curiosos ("Sabías que..."), comentarios positivos y estadísticas relevantes.
+    *   **Generación de Contenido de Marketing:** Los clientes pueden usar la IA para crear borradores de publicaciones atractivas para redes sociales con un solo clic.
+    *   **Optimización SEO Automática:** La IA sugiere títulos y descripciones optimizados para motores de búsqueda para cada vehículo.
+
+*   **Sistema de Suscripciones y Pagos (Stripe):**
+    *   **Modelo de Suscripción:** Los clientes deben tener una suscripción activa para poder añadir autos, asegurando el modelo de negocio.
+    *   **Checkout Seguro:** Integración con Stripe Checkout para un proceso de pago fácil y seguro.
+    *   **Portal de Cliente de Stripe:** Los clientes pueden gestionar sus suscripciones, métodos de pago y facturas directamente.
+    *   **Webhooks Automatizados:** Sincronización en tiempo real del estado de las suscripciones entre Stripe y la aplicación.
+
+*   **Gestión de Inventario Profesional:**
+    *   **CRUD Completo de Autos:** Los clientes pueden crear, ver, editar y eliminar sus listados de autos.
+    *   **Carga de Imágenes a la Nube:** Sistema de carga de archivos robusto que sube las imágenes a un servicio de almacenamiento en la nube (Vercel Blob), optimizando el rendimiento y los costes.
 
 ## Stack Tecnológico
 
-*   **Framework:** Next.js (con App Router)
+*   **Framework:** Next.js (App Router)
 *   **Lenguaje:** TypeScript
 *   **Estilos:** Tailwind CSS
 *   **ORM:** Prisma
 *   **Autenticación:** NextAuth.js
-*   **Base de Datos:** PostgreSQL (diseñado y probado con Neon)
+*   **Base de Datos:** PostgreSQL (compatible con Neon)
+*   **IA:** Google Gemini
+*   **Pagos:** Stripe
+*   **Almacenamiento de Archivos:** Vercel Blob
 
 ---
 
-## Cómo Empezar (Setup)
+## Cómo Empezar (Setup Local)
 
-Sigue estos pasos para poner en marcha el proyecto localmente.
+### 1. Prerrequisitos
+- Node.js y npm
+- Una cuenta gratuita en [Neon](https://neon.tech/) para la base de datos PostgreSQL.
+- Una cuenta de desarrollador en [Stripe](https://dashboard.stripe.com/register).
+- Una clave de API de [Google AI Studio](https://aistudio.google.com/) para Gemini.
 
-### 1. Clona el Repositorio
-
-```bash
-git clone <URL_DEL_REPOSITORIO>
-cd car-portal
-```
-
-### 2. Instala las Dependencias
-
-```bash
-npm install
-```
-
-### 3. Configura la Base de Datos en Neon
-
-Este proyecto está diseñado para funcionar con una base de datos PostgreSQL gratuita de Neon.
-
-1.  **Crea una cuenta en Neon:** Ve a [Neon](https://neon.tech/) y regístrate para obtener una cuenta gratuita.
-2.  **Crea un nuevo proyecto:** Sigue las instrucciones para crear un nuevo proyecto. Neon te proporcionará una base de datos PostgreSQL.
-3.  **Obtén la URL de conexión:** En el dashboard de tu proyecto en Neon, busca la URL de conexión de la base de datos. Se verá algo así como:
+### 2. Instalación
+1.  **Clona el repositorio:**
+    ```bash
+    git clone <URL_DEL_REPOSITORIO>
+    cd car-portal
     ```
-    postgresql://user:password@ep-ancient-sound-a2bcdefg.eu-central-1.aws.neon.tech/dbname?sslmode=require
-    ```
-    **Importante:** Asegúrate de que la URL que uses para Prisma **incluya `?pgbouncer=true`** para un pooling de conexiones eficiente. Deberás añadir `&schema=public` al final si no está presente. Tu URL final debería parecerse a esto:
-    ```
-    postgresql://user:password@...aws.neon.tech/dbname?sslmode=require&pgbouncer=true&schema=public
+2.  **Instala las dependencias:**
+    ```bash
+    npm install
     ```
 
-### 4. Configura las Variables de Entorno
-
-Crea un archivo llamado `.env` en la raíz del directorio `car-portal`. Copia y pega el siguiente contenido, reemplazando los valores con tus propias credenciales.
+### 3. Configuración de Variables de Entorno
+Crea un archivo `.env` en la raíz del proyecto. Copia el contenido de `.env.example` (si existe, o usa la siguiente plantilla) y rellena las variables:
 
 ```env
-# URL de la base de datos que obtuviste de Neon
+# Base de Datos (Neon)
+# Asegúrate de que la URL incluye ?sslmode=require&pgbouncer=true
 DATABASE_URL="TU_URL_DE_CONEXION_DE_NEON"
 
-# Un secreto aleatorio para NextAuth.js. Puedes generar uno aquí: https://generate-secret.vercel.app/32
-NEXTAUTH_SECRET="TU_SECRETO_PARA_NEXTAUTH"
+# Autenticación
+NEXTAUTH_SECRET="GENERA_UN_SECRETO_ALEATORIO"
+NEXTAUTH_URL="http://localhost:3000"
+
+# IA (Google Gemini)
+GEMINI_API_KEY="TU_API_KEY_DE_GEMINI"
+
+# Stripe
+STRIPE_SECRET_KEY="TU_CLAVE_SECRETA_DE_STRIPE"
+STRIPE_WEBHOOK_SECRET="TU_SECRETO_DEL_WEBHOOK"
+NEXT_PUBLIC_STRIPE_PRICE_ID="ID_DEL_PRECIO_DE_TU_PRODUCTO_EN_STRIPE"
+
+# Vercel Blob (para subida de imágenes)
+BLOB_READ_WRITE_TOKEN="TU_TOKEN_DE_VERCEL_BLOB"
 ```
 
-### 5. Aplica las Migraciones y Puebla la Base de Datos
-
-Estos comandos prepararán tu base de datos Neon y la llenarán con los datos de prueba (superadmin, clientes y autos).
-
+### 4. Base de Datos y Datos de Prueba
+Aplica las migraciones de la base de datos y puebla con datos de prueba:
 ```bash
 npx prisma migrate deploy
 npm run db:seed
 ```
-*`migrate deploy` es el comando recomendado para aplicar migraciones en entornos de producción y staging.*
 
-### 6. Inicia el Servidor de Desarrollo
-
+### 5. Inicia el Servidor
 ```bash
 npm run dev
 ```
-
-¡Y listo! La aplicación debería estar corriendo en `http://localhost:3000`.
+La aplicación estará disponible en `http://localhost:3000`.
 
 **Credenciales de Prueba:**
 *   **Super Admin:** `superadmin@example.com` / `superadmin_password`
 *   **Cliente 1:** `admin@automundo.com` / `client1_password`
 *   **Cliente 2:** `admin@carrosdelsol.com` / `client2_password`
-
 ---
 
-## Próximos Pasos y Tareas Pendientes (TODO)
+## Posibles Mejoras Futuras
 
-Esta es una base sólida, pero la visión completa del proyecto es mucho más grande. Los siguientes pasos lógicos son:
+El proyecto actual es una base sólida y completa. Las siguientes características podrían implementarse para expandir aún más la plataforma:
 
-*   **[TODO] Conectar una IA Real:** Integrar un modelo de lenguaje (como GPT-4, Llama, etc.) para generar dinámicamente el contenido de `CarModelInfo` cuando se añade un nuevo tipo de auto.
-*   **[TODO] Implementar Funcionalidad de Editar:** Añadir los formularios y la lógica para que los clientes puedan editar sus listados de autos.
-*   **[TODO] Herramientas de Marketing y SEO:** Desarrollar las funcionalidades automáticas de generación de estrategias SEO y contenido para redes sociales.
-*   **[TODO] Sistema de Subida de Imágenes:** Reemplazar las URLs de imágenes por un sistema de subida de archivos real a un servicio de almacenamiento (como S3, Cloudinary, etc.).
-*   **[TODO] Funcionalidades de Super Admin:** Expandir el panel de administración para incluir la gestión de clientes (crear, editar, suspender) y el sistema de cobros.
+*   **Personalización de Temas:** Permitir que el superadministrador personalice la apariencia visual del portal.
+*   **Analíticas Avanzadas:** Integrar un dashboard de analíticas más detallado sobre el comportamiento de los usuarios.
+*   **Sistema de Comentarios Públicos:** Permitir que los visitantes dejen comentarios y valoraciones en los autos.
+
+Este proyecto es una demostración completa de cómo construir una aplicación web moderna, escalable y rica en funcionalidades utilizando las mejores herramientas del ecosistema de JavaScript.

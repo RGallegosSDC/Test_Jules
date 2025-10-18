@@ -26,7 +26,7 @@ export async function createCar(prevState: { message: string }, formData: FormDa
   const year = Number(formData.get('year'));
   const price = Number(formData.get('price'));
   const description = formData.get('description') as string;
-  const images = formData.get('images') as string; // This is now a JSON string of URLs
+  const images = formData.get('images') as string; // Esto es ahora una cadena JSON de URLs
 
   if (!make || !model || !year || !price || !description) {
     return { message: 'Todos los campos marcados con * son obligatorios.' };
@@ -67,7 +67,7 @@ export async function createCar(prevState: { message: string }, formData: FormDa
       });
     }
 
-    // Link the AI content to the new car
+    // Vincula el contenido de IA al nuevo auto
     await prisma.car.update({
       where: { id: newCar.id },
       data: { carModelInfoId: carModelInfo.id },
@@ -95,8 +95,8 @@ export async function createCar(prevState: { message: string }, formData: FormDa
         },
       });
     } catch (seoError) {
-      console.error("Could not parse SEO content from AI:", seoError);
-      // Non-critical error, so we don't block the car creation
+      console.error("No se pudo analizar el contenido SEO de la IA:", seoError);
+      // Error no crítico, así que no bloqueamos la creación del auto
     }
 
   } catch (e) {
@@ -104,9 +104,9 @@ export async function createCar(prevState: { message: string }, formData: FormDa
     return { message: 'Error al crear el auto en la base de datos.' };
   }
 
-  // Revalidate the dashboard path to show the new car
+  // Revalida la ruta del dashboard para mostrar el nuevo auto
   revalidatePath('/dashboard');
-  // Redirect back to the dashboard
+  // Redirige de vuelta al dashboard
   redirect('/dashboard');
 }
 
@@ -130,8 +130,8 @@ export async function deleteCar(formData: FormData) {
     throw new Error('Auto no encontrado');
   }
 
-  // Check permissions: SUPERADMIN can delete any car,
-  // CLIENT_ADMIN can only delete their own cars.
+  // Comprobar permisos: SUPERADMIN puede eliminar cualquier auto,
+  // CLIENT_ADMIN solo puede eliminar sus propios autos.
   const userIsSuperAdmin = session.user.role === 'SUPERADMIN';
   const userIsOwner = car.clientId === session.user.clientId;
 
@@ -143,7 +143,7 @@ export async function deleteCar(formData: FormData) {
     where: { id: carId },
   });
 
-  // Revalidate both client and admin dashboards
+  // Revalida tanto el dashboard del cliente como el del administrador
   revalidatePath('/dashboard');
   revalidatePath('/admin/cars');
 }
@@ -159,7 +159,7 @@ export async function updateCar(prevState: { message: string }, formData: FormDa
     return { message: 'ID del auto no encontrado.' };
   }
 
-  // Authorization check
+  // Comprobación de autorización
   const car = await prisma.car.findUnique({
     where: { id: carId },
     select: { clientId: true },
@@ -176,13 +176,13 @@ export async function updateCar(prevState: { message: string }, formData: FormDa
     return { message: 'Permiso denegado para editar este auto.' };
   }
 
-  // Data validation and processing
+  // Validación y procesamiento de datos
   const make = formData.get('make') as string;
   const model = formData.get('model') as string;
   const year = Number(formData.get('year'));
   const price = Number(formData.get('price'));
   const description = formData.get('description') as string;
-  const images = formData.get('images') as string; // This is now a JSON string of URLs
+  const images = formData.get('images') as string; // Esto es ahora una cadena JSON de URLs
 
   if (!make || !model || !year || !price || !description) {
     return { message: 'Todos los campos marcados con * son obligatorios.' };
@@ -224,7 +224,7 @@ export async function generateMarketingPost(carId: string) {
     return { error: 'Auto no encontrado' };
   }
 
-  // Authorization check
+  // Comprobación de autorización
   const userIsOwner = car.clientId === session.user.clientId;
   const userIsSuperAdmin = session.user.role === 'SUPERADMIN';
 

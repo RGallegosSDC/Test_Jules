@@ -22,7 +22,7 @@ export async function createClient(prevState: { message: string, success: boolea
   }
 
   try {
-    // Check if client or user email already exists
+    // Comprueba si el cliente o el correo electrónico del usuario ya existen
     const existingClient = await prisma.client.findUnique({ where: { name } });
     if (existingClient) {
       return { message: 'Ya existe un cliente con este nombre.', success: false };
@@ -34,7 +34,7 @@ export async function createClient(prevState: { message: string, success: boolea
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create the client and the admin user in a transaction
+    // Crea el cliente y el usuario administrador en una transacción
     await prisma.$transaction(async (tx) => {
       const newClient = await tx.client.create({
         data: { name },
@@ -70,18 +70,18 @@ export async function deleteClient(formData: FormData) {
         throw new Error('ID del cliente no proporcionado');
     }
 
-    // Use a transaction to delete the client and all associated data
+    // Usa una transacción para eliminar el cliente y todos sus datos asociados
     try {
         await prisma.$transaction(async (tx) => {
-            // First, delete related cars to avoid foreign key constraint errors
+            // Primero, elimina los autos relacionados para evitar errores de clave foránea
             await tx.car.deleteMany({
                 where: { clientId: clientId },
             });
-            // Then, delete related users
+            // Luego, elimina los usuarios relacionados
             await tx.user.deleteMany({
                 where: { clientId: clientId },
             });
-            // Finally, delete the client
+            // Finalmente, elimina el cliente
             await tx.client.delete({
                 where: { id: clientId },
             });
@@ -112,19 +112,19 @@ export async function updateClient(prevState: { message: string }, formData: For
 
   try {
     await prisma.$transaction(async (tx) => {
-      // Update client name
+      // Actualiza el nombre del cliente
       await tx.client.update({
         where: { id: clientId },
         data: { name },
       });
 
-      // Prepare user data
+      // Prepara los datos del usuario
       const userData: { email: string; password?: string } = { email };
       if (password) {
         userData.password = await bcrypt.hash(password, 10);
       }
 
-      // Update user details
+      // Actualiza los detalles del usuario
       await tx.user.update({
         where: { id: userId },
         data: userData,

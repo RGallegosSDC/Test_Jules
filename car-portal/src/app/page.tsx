@@ -3,15 +3,22 @@ import Link from 'next/link';
 import SearchForm from '@/components/SearchForm';
 import { Suspense } from 'react';
 
-// This component will display a single car card
+// Este componente muestra una única tarjeta de auto.
 function CarCard({ car }: { car: any }) {
+  // Parsea las imágenes y toma la primera, si existe.
+  const images = typeof car.images === 'string' ? JSON.parse(car.images) : [];
+  const imageUrl = images.length > 0 ? images[0] : null;
+
   return (
-    <Link href={`/car/${car.id}`} className="border rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-      <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
-        {/* We will use a placeholder image for now */}
-        <span className="text-gray-500">Imagen no disponible</span>
+    <Link href={`/car/${car.id}`} className="border rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
+      <div className="w-full h-48 bg-gray-200 flex items-center justify-center overflow-hidden">
+        {imageUrl ? (
+          <img src={imageUrl} alt={`${car.make} ${car.model}`} className="w-full h-full object-cover" />
+        ) : (
+          <span className="text-gray-500">Imagen no disponible</span>
+        )}
       </div>
-      <div className="p-4">
+      <div className="p-4 flex-grow flex flex-col">
         <h3 className="text-xl font-bold">{car.make} {car.model}</h3>
         <p className="text-lg font-semibold text-blue-600">${car.price.toLocaleString()}</p>
         <p className="text-sm text-gray-600">{car.year}</p>
@@ -32,7 +39,7 @@ interface HomePageProps {
   };
 }
 
-// The main page component that fetches and displays all cars
+// El componente principal de la página que busca y muestra todos los autos.
 export default async function HomePage({ searchParams }: HomePageProps) {
   const { query, minPrice, maxPrice, minYear, maxYear } = searchParams;
 
@@ -59,7 +66,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     where.year = { ...where.year, lte: parseInt(maxYear, 10) };
   }
 
-  // Fetch cars from the database based on filters
+  // Busca los autos en la base de datos según los filtros.
   const cars = await prisma.car.findMany({
     where,
     orderBy: {

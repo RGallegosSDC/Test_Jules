@@ -13,7 +13,7 @@ export default function MarketingButton({ carId }: { carId: string }) {
       if (result.error) {
         alert(`Error: ${result.error}`);
       } else {
-        // Show the generated post in an alert for this proof of concept
+        // Muestra la publicación generada en una alerta para esta prueba de concepto
         alert('--- Borrador de Publicación para Redes Sociales ---\n\n' + result.success);
       }
     } catch (e) {

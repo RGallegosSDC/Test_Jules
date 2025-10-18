@@ -28,16 +28,16 @@ const safetySettings = [
 ];
 
 /**
- * Generates AI-powered content for a specific car model.
- * @param make The make of the car (e.g., "Toyota").
- * @param model The model of the car (e.g., "Camry").
- * @returns An object containing AI-generated fun facts, positive comments, and statistics.
+ * Genera contenido impulsado por IA para un modelo de auto específico.
+ * @param make La marca del auto (por ejemplo, "Toyota").
+ * @param model El modelo del auto (por ejemplo, "Camry").
+ * @returns Un objeto que contiene datos curiosos, comentarios positivos y estadísticas generados por IA.
  */
 export async function generateCarModelInfo(make: string, carModel: string) {
   if (!API_KEY) {
-    // Return dummy data if the API key is not set, so the app doesn't crash.
+    // Devuelve datos de prueba si la clave de API no está configurada, para que la aplicación no se bloquee.
     return {
-      funFacts: ['AI features are disabled. Please set GOOGLE_API_KEY.'],
+      funFacts: ['Las funciones de IA están deshabilitadas. Por favor, configure GOOGLE_API_KEY.'],
       positiveComments: ['High reliability.'],
       statistics: ['Good fuel economy.'],
     };
@@ -66,7 +66,7 @@ export async function generateCarModelInfo(make: string, carModel: string) {
     });
 
     const responseText = result.response.text();
-    // Clean the response to ensure it's a valid JSON string
+    // Limpia la respuesta para asegurar que sea una cadena JSON válida
     const jsonString = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
 
     const parsedResponse = JSON.parse(jsonString);
@@ -79,7 +79,7 @@ export async function generateCarModelInfo(make: string, carModel: string) {
 
   } catch (error) {
     console.error('Error calling Google Gemini API:', error);
-    // Return a fallback object in case of an API error
+    // Devuelve un objeto de respaldo en caso de un error de la API
     return {
       funFacts: ['No se pudo generar información de IA en este momento.'],
       positiveComments: [],
@@ -89,13 +89,13 @@ export async function generateCarModelInfo(make: string, carModel: string) {
 }
 
 /**
- * Generates text content based on a given prompt.
- * @param prompt The instruction for the AI.
- * @returns The generated text as a string.
+ * Genera contenido de texto basado en un prompt dado.
+ * @param prompt La instrucción para la IA.
+ * @returns El texto generado como una cadena.
  */
 export async function generateText(prompt: string): Promise<string> {
   if (!API_KEY) {
-    return 'AI features are disabled. Please set GOOGLE_API_KEY.';
+    return 'Las funciones de IA están deshabilitadas. Por favor, configure GOOGLE_API_KEY.';
   }
 
   try {

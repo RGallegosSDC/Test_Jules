@@ -9,16 +9,16 @@ const initialState = {
   message: '',
 };
 
-// The car prop contains the initial data to populate the form
+// La prop 'car' contiene los datos iniciales para rellenar el formulario
 export default function EditCarForm({ car }: { car: Car }) {
   const [state, formAction] = useFormState(updateCar, initialState);
 
-  // The images are stored as a JSON string, so we parse them for the uploader
+  // Las imágenes se almacenan como una cadena JSON, así que las parseamos para el cargador
   const initialImages = JSON.parse(car.images || '[]');
 
   return (
     <form action={formAction} className="bg-white p-8 rounded-lg shadow-md space-y-6">
-      {/* Hidden input to pass the car's ID to the server action */}
+      {/* Input oculto para pasar el ID del auto a la acción del servidor */}
       <input type="hidden" name="carId" value={car.id} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -3,9 +3,9 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import { UserRole } from '@prisma/client';
-import EditCarForm from '@/components/EditCarForm'; // We will create this component next
+import EditCarForm from '@/components/EditCarForm'; // Crearemos este componente a continuación
 
-// This server component fetches the car data and handles authorization
+// Este componente de servidor busca los datos del auto y maneja la autorización
 export default async function EditCarPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
 
@@ -25,18 +25,18 @@ export default async function EditCarPage({ params }: { params: { id: string } }
     );
   }
 
-  // Authorization check: only the owner or a superadmin can edit
+  // Comprobación de autorización: solo el propietario o un superadministrador pueden editar
   const userIsOwner = car.clientId === session.user.clientId;
   const userIsSuperAdmin = session.user.role === UserRole.SUPERADMIN;
 
   if (!userIsOwner && !userIsSuperAdmin) {
-    redirect('/dashboard'); // Or show an unauthorized page
+    redirect('/dashboard'); // O mostrar una página de no autorizado
   }
 
   return (
     <div className="container mx-auto p-4 max-w-2xl">
       <h1 className="text-3xl font-bold mb-6">Editar Auto</h1>
-      {/* The form itself will be a client component */}
+      {/* El formulario en sí será un componente de cliente */}
       <EditCarForm car={car} />
     </div>
   );

@@ -17,28 +17,32 @@ export default async function AdminDashboardPage() {
   }));
 
   const totalCars = chartData.reduce((sum, client) => sum + client.autos, 0);
+  const totalClients = clientsWithCarCount.length;
+  const activeSubscriptions = await prisma.client.count({
+    where: { subscriptionStatus: 'active' },
+  });
 
   return (
     <div>
       <h1 className="text-3xl font-bold mb-6">Dashboard del Administrador</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        {/* Stat Card: Total Clients */}
+        {/* Tarjeta de Estadística: Clientes Totales */}
         <div className="bg-white p-6 rounded-lg shadow-md text-center">
-          <h2 className="text-xl font-semibold text-gray-700">Total de Clientes</h2>
-          <p className="text-4xl font-bold text-blue-600 mt-2">{chartData.length}</p>
+          <h2 className="text-xl font-semibold text-gray-700">Clientes Totales</h2>
+          <p className="text-4xl font-bold text-blue-600 mt-2">{totalClients}</p>
         </div>
 
-        {/* Stat Card: Total Cars */}
+        {/* Tarjeta de Estadística: Autos Totales */}
         <div className="bg-white p-6 rounded-lg shadow-md text-center">
-          <h2 className="text-xl font-semibold text-gray-700">Total de Autos Listados</h2>
+          <h2 className="text-xl font-semibold text-gray-700">Autos Totales Listados</h2>
           <p className="text-4xl font-bold text-green-600 mt-2">{totalCars}</p>
         </div>
 
-        {/* Placeholder for future stats */}
+        {/* Tarjeta de Estadística: Suscripciones Activas */}
         <div className="bg-white p-6 rounded-lg shadow-md text-center">
-          <h2 className="text-xl font-semibold text-gray-700">Ingresos (Próximamente)</h2>
-          <p className="text-4xl font-bold text-purple-600 mt-2">$0</p>
+          <h2 className="text-xl font-semibold text-gray-700">Suscripciones Activas</h2>
+          <p className="text-4xl font-bold text-purple-600 mt-2">{activeSubscriptions}</p>
         </div>
       </div>
 

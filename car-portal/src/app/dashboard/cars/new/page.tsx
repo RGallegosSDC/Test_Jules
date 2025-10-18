@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import NewCarForm from '@/components/NewCarForm';
 
-// This server component checks for an active subscription before rendering the form.
+// Este componente de servidor comprueba si hay una suscripción activa antes de renderizar el formulario.
 export default async function NewCarPage() {
   const session = await getServerSession(authOptions);
 

@@ -9,7 +9,7 @@ export default function Header() {
   const pathname = usePathname();
   const isLoading = status === 'loading';
 
-  // Do not render header for admin panel routes
+  // No renderizar el encabezado para las rutas del panel de administración
   if (pathname.startsWith('/admin')) {
     return null;
   }

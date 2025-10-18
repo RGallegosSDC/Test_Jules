@@ -1,17 +1,20 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import type { Metadata, ResolvingMetadata } from 'next';
+import FunFactCard from '@/components/ai/FunFactCard';
+import ExpertReview from '@/components/ai/ExpertReview';
+import StatsHighlight from '@/components/ai/StatsHighlight';
 
 type Props = {
   params: { id: string };
 };
 
-// This function generates dynamic metadata for the page
+// Esta función genera metadatos dinámicos para la página
 export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  // fetch data
+  // busca datos
   const car = await prisma.car.findUnique({
     where: { id: params.id },
     select: { make: true, model: true, year: true, seoTitle: true, seoDescription: true },
@@ -34,13 +37,13 @@ export async function generateMetadata(
 }
 
 
-// This is the main component for the car detail page
+// Este es el componente principal de la página de detalle del auto
 export default async function CarDetailPage({ params }: Props) {
-  // Fetch the specific car from the database, including the AI-generated info
+  // Busca el auto específico en la base de datos, incluyendo la información generada por IA
   const car = await prisma.car.findUnique({
     where: { id: params.id },
     include: {
-      carModelInfo: true, // Include the related AI content
+      carModelInfo: true, // Incluye el contenido de IA relacionado
     },
   });
 
@@ -55,7 +58,7 @@ export default async function CarDetailPage({ params }: Props) {
     );
   }
 
-  // Parse JSON strings into arrays
+  // Parsea las cadenas JSON a arreglos
   const images = typeof car.images === 'string' ? JSON.parse(car.images) : [];
   const funFacts = car.carModelInfo && typeof car.carModelInfo.funFacts === 'string' ? JSON.parse(car.carModelInfo.funFacts) : [];
   const positiveComments = car.carModelInfo && typeof car.carModelInfo.positiveComments === 'string' ? JSON.parse(car.carModelInfo.positiveComments) : [];
@@ -65,7 +68,7 @@ export default async function CarDetailPage({ params }: Props) {
   return (
     <main className="container mx-auto p-4">
       <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-        {/* Image Gallery */}
+        {/* Galería de Imágenes */}
         <div className="p-4">
           <div className="w-full h-96 bg-gray-200 flex items-center justify-center mb-4 rounded-lg">
             {images.length > 0 ? (
@@ -84,16 +87,12 @@ export default async function CarDetailPage({ params }: Props) {
         </div>
 
         <div className="p-6">
-          {/* Main Info */}
+          {/* Información Principal */}
           <h1 className="text-4xl font-extrabold mb-2">{car.make} {car.model}</h1>
           <p className="text-2xl font-semibold text-blue-600 mb-4">${car.price.toLocaleString()}</p>
           <p className="text-lg text-gray-700 mb-6">{car.description}</p>
 
-import FunFactCard from '@/components/ai/FunFactCard';
-import ExpertReview from '@/components/ai/ExpertReview';
-import StatsHighlight from '@/components/ai/StatsHighlight';
-
-          {/* AI-Generated Content Section */}
+          {/* Sección de Contenido Generado por IA */}
           {car.carModelInfo && (
             <div className="mt-10 pt-8 border-t border-gray-200">
               <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">Análisis por IA de nuestro portal</h2>
